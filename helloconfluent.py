@@ -1,25 +1,21 @@
 from flask import Flask
-from kafka import KafkaProducer
+from confluent_kafka import Producer
 import logging
 import json
 
 def get_kafka_producer():
-    return KafkaProducer(
-        bootstrap_servers=['r0.kafka-mt-1.us-west-2.aws.stag.cpdev.cloud:9092',
-                           'r0.kafka-mt-1.us-west-2.aws.stag.cpdev.cloud:9093',
-                           'r0.kafka-mt-1.us-west-2.aws.stag.cpdev.cloud:9094'],
-        value_serializer=lambda m: json.dumps(m).encode('ascii'),
-        retry_backoff_ms=500,
-        request_timeout_ms=20000,
-        security_protocol='SASL_SSL',
-        sasl_mechanism='PLAIN',
-        sasl_plain_username='OEPJVGM5NEHVWRV4',
-        sasl_plain_password='y2u15Gou/nxzp72tyyt8d0O+7ztWJipZQySUiKWuzY0qSNes2KmH/dqvunY4zj0s')
+    return Producer({'sasl.mechanisms':'PLAIN',
+                     'request.timeout.ms': 20000,
+                     'bootstrap.servers':'SASL_SSL://r0.kafka-mt-1.us-west-2.aws.stag.cpdev.cloud:9092,r0.kafka-mt-1.us-west-2.aws.stag.cpdev.cloud:9093,r0.kafka-mt-1.us-west-2.aws.stag.cpdev.cloud:9094',
+                     'retry.backoff.ms':500,
+                     'sasl.username':'OEPJVGM5NEHVWRV4',
+                     'sasl.password':'y2u15Gou/nxzp72tyyt8d0O+7ztWJipZQySUiKWuzY0qSNes2KmH/dqvunY4zj0s',
+                     'security.protocol':'SASL_SSL'})
 
 # print a nice greeting.
 def say_hello(username = "World"):
     # record the event asynchronously
-    producer.send('webapp', {'says-hello' : username})
+    producer.produce('webapp', username + ', says-hello')
     return '<p>Hello %s!</p>\n' % username
 
 
