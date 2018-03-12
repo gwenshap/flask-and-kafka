@@ -14,8 +14,10 @@ def get_kafka_producer():
 
 # print a nice greeting.
 def say_hello(username = "World"):
-    # record the event asynchronously
+    # record the event synchronously
+    # calling flush() guarantees that each event is written to Kafka before continuing
     producer.produce('webapp', username + ', says-hello')
+    producer.flush()
     return '<p>Hello %s!</p>\n' % username
 
 
